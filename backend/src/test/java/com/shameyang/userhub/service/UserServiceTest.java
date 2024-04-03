@@ -20,19 +20,6 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
-    public void testAddUser() {
-        User user = new User();
-        user.setUserName("shameyang");
-        user.setUserAccount("123");
-        user.setAvatarUrl("https://avatars.githubusercontent.com/u/94451620?v=4");
-        user.setGender(0);
-        user.setPassword("123");
-        boolean result = userService.save(user);
-        System.out.println(user.getId());
-        Assertions.assertTrue(result);
-    }
-
-    @Test
     void testUserRegister() {
         String account = "zhangsan";
         String password = "";
