@@ -15,6 +15,8 @@ import org.springframework.util.DigestUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.shameyang.userhub.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
  * @author shameyang
  * @description 针对表【user(用户)】的数据库操作Service实现
@@ -28,11 +30,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值，混淆密码
      */
     private static final String SALT = "abigsalt";
-
-    /**
-     * 用户登录态键
-     */
-    private static final String USER_LOGIN_STATE = "userLoginState";
 
     @Override
     public long userRegister(String userAccount, String password, String checkPwd) {
@@ -107,6 +104,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         // 3.用户信息脱敏
+        User handleUser = getHandlerUser(user);
+        // 4.记录用户登录态
+        request.getSession().setAttribute(USER_LOGIN_STATE, handleUser);
+        return handleUser;
+    }
+
+    /**
+     * 用户信息脱敏
+     * @param user 原用户
+     * @return 脱敏后的用户
+     */
+    @Override
+    public User getHandlerUser(User user) {
         User handleUser = new User();
         handleUser.setId(user.getId());
         handleUser.setUserName(user.getUserName());
@@ -116,9 +126,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         handleUser.setPhone(user.getPhone());
         handleUser.setEmail(user.getEmail());
         handleUser.setUserStatus(user.getUserStatus());
+        handleUser.setUserRole(user.getUserRole());
         handleUser.setCreateTime(user.getCreateTime());
-        // 4.记录用户登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, handleUser);
         return handleUser;
     }
 }
