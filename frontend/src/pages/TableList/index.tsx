@@ -99,6 +99,7 @@ const TableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
+  // @ts-ignore
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
@@ -108,7 +109,7 @@ const TableList: React.FC = () => {
     {
       title: '规则名称',
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
+      // tip: 'The rule name is the unique key',
       render: (dom, entity) => {
         return (
           <a
