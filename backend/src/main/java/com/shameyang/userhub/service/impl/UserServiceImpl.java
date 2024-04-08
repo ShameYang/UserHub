@@ -51,6 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 密码和确认密码相同
         if (!password.equals(checkPwd)) {
+            log.info("password not match");
             return -1;
         }
         // 账号不能重复
@@ -58,6 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("user_account", userAccount);
         long count = this.count(queryWrapper);
         if (count > 0) {
+            log.info("user already exists");
             return -1;
         }
         // 2.密码加密

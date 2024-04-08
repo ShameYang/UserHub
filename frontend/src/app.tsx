@@ -26,7 +26,7 @@ export async function getInitialState(): Promise<{
       });
       return msg.data;
     } catch (error) {
-      history.push(loginPath);
+      // history.push(loginPath);
     }
     return undefined;
   };
@@ -63,31 +63,16 @@ export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => 
     footerRender: () => <Footer/>,
     onPageChange: () => {
       const {location} = history;
+      // 白名单
+      const whiteList = ['/user/register', loginPath];
+      if (whiteList.includes(location.pathname)) {
+        return;
+      }
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      if (!initialState?.currentUser) {
         history.push(loginPath);
       }
     },
-    bgLayoutImgList: [
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/D2LWSqNny4sAAAAAAAAAAAAAFl94AQBr',
-        left: 85,
-        bottom: 100,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/C2TWRpJpiC0AAAAAAAAAAAAAFl94AQBr',
-        bottom: -68,
-        right: -45,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/F6vSTbj8KpYAAAAAAAAAAAAAFl94AQBr',
-        bottom: 0,
-        left: 0,
-        width: '331px',
-      },
-    ],
     links: isDev
       ? [
         <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
@@ -129,5 +114,5 @@ export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => 
  * @name request 配置
  */
 export const request: RequestConfig = {
-  timeout: 10000,
+  timeout: 20000,
 };
