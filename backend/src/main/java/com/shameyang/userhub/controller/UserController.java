@@ -56,6 +56,18 @@ public class UserController {
         return userService.userLogin(userAccount, password, request);
     }
 
+    @GetMapping("/current")
+    public User getCurrentUser(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null) {
+            return null;
+        }
+        long userId = currentUser.getId();
+        User user = userService.getById(userId);
+        return userService.getHandlerUser(user);
+    }
+
     @GetMapping("/search")
     public List<User> searchUser(String username, HttpServletRequest request) {
         if (isNotAdmin(request)) {
