@@ -58,17 +58,14 @@ const Register: React.FC = () => {
     try {
       // 注册
       const id = await register(values);
-      if (id > 0) {
+      if (id) {
         const defaultRegisterSuccessMessage = '注册成功！';
         message.success(defaultRegisterSuccessMessage);
-        history.push('/user/login?');
+        history.push('/user/login');
         return;
-      } else {
-        throw new Error(`register error id = ${id}`)
       }
     } catch (error) {
       const defaultRegisterFailureMessage = '注册失败，请重试！';
-      console.log(error);
       message.error(defaultRegisterFailureMessage);
     }
   };

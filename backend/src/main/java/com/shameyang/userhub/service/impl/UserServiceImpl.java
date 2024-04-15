@@ -2,6 +2,8 @@ package com.shameyang.userhub.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.shameyang.userhub.common.ErrorCode;
+import com.shameyang.userhub.exception.BusinessException;
 import com.shameyang.userhub.model.domain.User;
 import com.shameyang.userhub.service.UserService;
 import com.shameyang.userhub.mapper.UserMapper;
@@ -35,24 +37,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public long userRegister(String userAccount, String password, String checkPwd) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, password, checkPwd)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过短");
         }
         if (password.length() < 6) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码过短");
         }
         // 账号不能包含特殊字符
         String validPattern = "[`~!@#$%^&*()+=|{}:;\\\\\\\\[\\\\\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？']";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号包含特殊字符");
         }
         // 密码和确认密码相同
         if (!password.equals(checkPwd)) {
             log.info("password not match");
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次密码不一致");
         }
         // 账号不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -60,7 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         long count = this.count(queryWrapper);
         if (count > 0) {
             log.info("user already exists");
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号已存在");
         }
         // 2.密码加密
         String handlePassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
@@ -70,7 +72,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setPassword(handlePassword);
         boolean saveResult = this.save(user);
         if (!saveResult) {
-            return -1;
+            throw new BusinessException(ErrorCode.INSERT_ERROR);
         }
         return user.getId();
     }
@@ -79,19 +81,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String userAccount, String password, HttpServletRequest request) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, password)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号过短");
         }
         if (password.length() < 6) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码过短");
         }
         // 账号不能包含特殊字符
         String validPattern = "[`~!@#$%^&*()+=|{}:;\\\\\\\\[\\\\\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？']";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号包含特殊字符");
         }
         // 2.加密
         String handlePassword = DigestUtils.md5DigestAsHex((SALT + password).getBytes());
@@ -103,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 用户不存在
         if (user == null) {
             log.info("user login failed, not match");
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "用户不匹配");
         }
         // 3.用户信息脱敏
         User handleUser = getHandlerUser(user);
@@ -120,7 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getHandlerUser(User user) {
         if (user == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR);
         }
         User handleUser = new User();
         handleUser.setId(user.getId());
