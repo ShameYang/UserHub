@@ -3,7 +3,13 @@ import {history} from "@@/core/history";
 import {stringify} from "querystring";
 import {message} from "antd";
 
-const request = extend({});
+/**
+ * 配置request请求时的默认参数
+ */
+const request = extend({
+  credentials: 'include', // 默认请求是否带上cookie
+  prefix: process.env.NODE_ENV === 'production' ? 'http://122.51.65.208' : undefined
+});
 
 /**
  * 所有请求拦截器
